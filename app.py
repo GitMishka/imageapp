@@ -2,7 +2,7 @@ from flask import Flask, request, send_file, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 import uuid
-
+from PIL import Image as PilImage
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
@@ -24,8 +24,13 @@ def upload_file():
         return 'No file part', 400
     file = request.files['file']
     filename = str(uuid.uuid4())
-    file.save(os.path.join(UPLOAD_FOLDER, filename))
-    new_image = Image(id=filename, filename=filename, mimetype=file.mimetype)
+    
+    # Open the image file with Pillow
+    img = PilImage.open(file)
+    # Convert the image to png and save it to the UPLOAD_FOLDER
+    img.save(os.path.join(UPLOAD_FOLDER, filename + '.png'), 'PNG')
+
+    new_image = Image(id=filename, filename=filename + '.png', mimetype='image/png')
     db.session.add(new_image)
     db.session.commit()
     return filename, 200
