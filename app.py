@@ -25,9 +25,7 @@ def upload_file():
     file = request.files['file']
     filename = str(uuid.uuid4())
     
-    # Open the image file with Pillow
     img = PilImage.open(file)
-    # Convert the image to png and save it to the UPLOAD_FOLDER
     img.save(os.path.join(UPLOAD_FOLDER, filename + '.png'), 'PNG')
 
     new_image = Image(id=filename, filename=filename + '.png', mimetype='image/png')
@@ -41,10 +39,11 @@ def download_file(filename):
 
 @app.route('/delete/<filename>', methods=['DELETE'])
 def delete_file(filename):
-    Image.query.filter_by(filename=filename).delete()
+    Image.query.filter_by(filename=filename + '.png').delete()
     db.session.commit()
-    os.remove(os.path.join(UPLOAD_FOLDER, filename))
+    os.remove(os.path.join(UPLOAD_FOLDER, filename + '.png'))
     return '', 200
+
 
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):
