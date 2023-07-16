@@ -1,8 +1,43 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Image Repository</title>
+    <style>
+        img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+</head>
 <body>
+    <h1>Image Repository</h1>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="Upload">
+    </form>
+
+    <hr>
+
     {% for image in images %}
-        <img src="{{ url_for('download_file', filename=image.filename) }}" />
+        <div>
+            <img src="{{ url_for('download_file', filename=image.filename) }}" alt="Image">
+            <button onclick="deleteImage('{{ image.filename }}')">Delete</button>
+        </div>
     {% endfor %}
+
+    <script>
+        function deleteImage(filename) {
+            fetch('/delete/' + filename, {
+                method: 'DELETE'
+            }).then(function(response) {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Failed to delete image', response);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
