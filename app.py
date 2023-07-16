@@ -29,3 +29,19 @@ def delete_file(filename):
 if __name__ == '__main__':
     app.run(debug=True)
 
+from flask_sqlalchemy import SQLAlchemy
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
+
+class Image(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    filename = db.Column(db.String, unique=True, nullable=False)
+    mimetype = db.Column(db.String, nullable=False)
+
+from flask import render_template
+
+@app.route('/')
+def index():
+    images = Image.query.all()
+    return render_template('index.html', images=images)
